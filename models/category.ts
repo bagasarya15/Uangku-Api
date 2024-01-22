@@ -12,7 +12,7 @@ import { users } from './users';
 
 export interface categoryAttributes {
   id: string;
-  user_id?: number;
+  user_id?: string;
   category_name?: string;
 }
 
@@ -26,8 +26,8 @@ export class category
   id!: string;
 
   @ForeignKey(() => users)
-  @Column({ allowNull: true, type: DataType.INTEGER })
-  user_id?: number;
+  @Column({ allowNull: true, type: DataType.STRING(255) })
+  user_id?: string;
 
   @Column({ allowNull: true, type: DataType.STRING(255) })
   category_name?: string;
