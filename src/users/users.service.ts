@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { Multer } from 'multer';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { users } from '../../models';
+import { roles, users } from '../../models';
 import { Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -13,7 +13,14 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class UsersService {
   async findAll() {
     try {
-      const data = await users.findAll();
+      const data = await users.findAll({
+        include: [
+          {
+            model: roles,
+            attributes: ['id', 'name'],
+          },
+        ],
+      });
 
       const response = {
         status: 200,
@@ -48,12 +55,18 @@ export class UsersService {
         const currentTimeUTC = DateTime.utc(); // Waktu dalam UTC
         const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta'); // Set zona waktu ke 'Asia/Jakarta'
 
+        const role_id = await roles.findOne({
+          where: {name : 'users'}
+        });
+
         const data = await users.create({
           id: myUUID,
           username: body.username,
           password: passHash,
           name: body.name,
           image: 'default.png',
+          role_id: role_id.id,
+          is_active: 1,
           created_at: currentTimeID.toJSDate(),
         });
 
