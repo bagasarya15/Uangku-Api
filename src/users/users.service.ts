@@ -3,7 +3,7 @@ import { Multer } from 'multer';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { roles, users } from '../../models';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
 import { CreateUserDto } from './dto/create-user.dto';
 import { cloudinaryConfig } from '../helpers/cloudinary';
@@ -45,15 +45,13 @@ export class UsersService {
       });
 
       if (checkUser) {
-        const response = {
-          status: 400,
+        throw new HttpException({
+          status: 422,
           message: 'Users already exist',
-        };
-
-        return response;
+        }, HttpStatus.UNPROCESSABLE_ENTITY);
       } else {
-        const currentTimeUTC = DateTime.utc(); // Waktu dalam UTC
-        const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta'); // Set zona waktu ke 'Asia/Jakarta'
+        const currentTimeUTC = DateTime.utc();
+        const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
 
         const role_id = await roles.findOne({
           where: {name : 'users'}
