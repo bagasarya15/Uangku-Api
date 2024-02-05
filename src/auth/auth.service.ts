@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
 import { LoginDto } from './dto/login.dto';
 import { roles, users } from '../../models';
@@ -20,38 +20,23 @@ export class AuthService {
         },
       });
 
-      const data = await users.findOne({
-        attributes: ['id', 'name', 'email', 'image', 'is_active'],
-        where: {
-          [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
-        },
-        include: [
-          {
-            model: roles,
-            attributes: ['id', 'name'],
-          },
-        ],
-      });
-
       if (!user) {
-        return 'email or username not found';
+        throw new HttpException({
+          status: 400,
+          message: 'wrong username or password',
+        }, HttpStatus.BAD_REQUEST);
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        return 'wrong password';
+        throw new HttpException({
+          status: 400,
+          message: 'wrong username or password',
+        }, HttpStatus.BAD_REQUEST);
       }
 
-      const token = jwt.sign(
-        {
-          data,
-        },
-        process.env.SECRET_KEY,
-        {
-          expiresIn: '30m',
-        },
-      );
+      const token = await this.generateToken(usernameOrEmail);
 
       return {
         status: 200,
@@ -60,7 +45,34 @@ export class AuthService {
         token: token,
       };
     } catch (error) {
-      return error.message;
+      throw error;
     }
+  }
+
+  async generateToken(usernameOrEmail: string): Promise<any> {
+    let data = await users.findOne({
+      attributes: ['id', 'name', 'email', 'image', 'is_active'],
+      where: {
+        [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+      },
+      include: [
+        {
+          model: roles,
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    const token = jwt.sign(
+      {
+        data,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: '30m',
+      },
+    );
+
+    return token;
   }
 }
