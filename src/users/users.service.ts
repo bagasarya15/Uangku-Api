@@ -3,16 +3,22 @@ import { Multer } from 'multer';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { roles, users } from '../../models';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { v2 as cloudinary } from 'cloudinary';
+import { GetUserDto } from './dto/get-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { cloudinaryConfig } from '../helpers/cloudinary';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { responsePaginate } from '../helpers/response-paginate';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Op } from 'sequelize';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
-  async findAll() {
+  async findAll(body: GetUserDto) {
     try {
+      const { page, limit } = body;
+      const offset = (page - 1) * limit;
       const data = await users.findAll({
         include: [
           {
@@ -20,19 +26,17 @@ export class UsersService {
             attributes: ['id', 'name'],
           },
         ],
+        limit: limit,
+        offset: offset,
       });
+      const totalCount = await users.count();
 
-      const response = {
-        status: 200,
-        message: 'success',
-        result: data,
-      };
-
-      return response;
+      return responsePaginate(data, totalCount, page, limit);
     } catch (error) {
-      return error;
+      throw error;
     }
   }
+  
 
   async create(body: CreateUserDto) {
     try {
@@ -62,19 +66,17 @@ export class UsersService {
           username: body.username,
           password: passHash,
           name: body.name,
-          image: 'default.png',
+          image: 'default.jpg',
           role_id: role_id.id,
           is_active: 1,
           created_at: currentTimeID.toJSDate(),
         });
 
-        const response = {
+        return {
           status: 201,
           message: 'Create users successfully',
           result: data,
         };
-
-        return response;
       }
     } catch (error: any) {
       throw error;
@@ -93,6 +95,21 @@ export class UsersService {
         };
       }
 
+      if (body.username !== userToUpdate.username) {
+        const existingUser = await users.findOne({
+            where: {
+                username: body.username
+            }
+        });
+
+        if (existingUser) {
+          throw new HttpException({
+            status: 422,
+            message: 'Users already exist',
+          }, HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+    }
+
       userToUpdate.username = body.username;
       userToUpdate.name = body.name;
       userToUpdate.email = body.email;
@@ -109,14 +126,77 @@ export class UsersService {
       }
 
       await userToUpdate.save();
+      
+      const token = await this.generateToken(userToUpdate.username);
 
       return {
         status: 200,
-        message: 'Profile updated successfully',
+        message: 'Update profile successfully',
         result: userToUpdate,
+        tokenUpdate : token
       };
     } catch (error: any) {
       throw error;
     }
+  }
+
+  async deleteImage(body: { userId: string }): Promise<any> {
+    try {
+        cloudinaryConfig();
+        const userId = body.userId;
+        const userToUpdate = await users.findByPk(userId);
+        if (!userToUpdate) {
+            return {
+                status: 404,
+                message: 'User not found',
+            };
+        }
+
+        if (userToUpdate.image) {
+          const publicId = userToUpdate.image.split('/').pop()?.split('.')[0];
+          if (publicId) {
+              const folderPublicId = `users/${publicId}`;
+              await cloudinary.uploader.destroy(folderPublicId);
+          }
+      }
+
+        userToUpdate.image = 'default.jpg';
+        await userToUpdate.save();
+        const token = await this.generateToken(userToUpdate.username);
+        return {
+            status: 200,
+            message: 'Image updated successfully',
+            tokenUpdate : token
+        };
+    } catch (error: any) {
+        throw error;
+    }
+  }
+
+  async generateToken(username: string): Promise<any> {
+    let data = await users.findOne({
+      attributes: ['id', 'username', 'name', 'email', 'image', 'is_active'],
+      where: {
+        username : username
+      },
+      include: [
+        {
+          model: roles,
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    const token = jwt.sign(
+      {
+        data,
+      },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: '30m',
+      },
+    );
+
+    return token;
   }
 }

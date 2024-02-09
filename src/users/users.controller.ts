@@ -8,20 +8,22 @@ import {
   // Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { Multer } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { GetUserDto } from './dto/get-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async findAll(): Promise<any> {
-    return this.usersService.findAll();
-  }
+async findAll(@Body() body: GetUserDto): Promise<any> {
+  return this.usersService.findAll(body);
+}
 
   @Post()
   async create(@Body() body: CreateUserDto): Promise<any> {
@@ -36,4 +38,12 @@ export class UsersController {
   ): Promise<any> {
     return this.usersService.updateProfile(body, file);
   }
+  
+  @Put('delete-image')
+  async updateImage(
+    @Body() userId: any
+  ): Promise<any> {
+    return this.usersService.deleteImage(userId);
+  }
+  
 }

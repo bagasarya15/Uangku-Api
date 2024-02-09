@@ -10,8 +10,8 @@ export class UpdateProfileDto {
   @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
-  @IsNotEmpty({ message: 'Email is required' })
-  @IsEmail({ require_tld: true }, { message: 'Invalid email format' })
+  @IsOptional()
+  // @IsEmail({}, { message: 'Invalid email format' })
   email: string;
 
   @IsOptional()

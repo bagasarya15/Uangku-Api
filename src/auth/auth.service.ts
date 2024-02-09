@@ -51,7 +51,7 @@ export class AuthService {
 
   async generateToken(usernameOrEmail: string): Promise<any> {
     let data = await users.findOne({
-      attributes: ['id', 'name', 'email', 'image', 'is_active'],
+      attributes: ['id', 'username', 'name', 'email', 'image', 'is_active'],
       where: {
         [Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
       },
