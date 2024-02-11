@@ -5,25 +5,24 @@ import {
   Body,
   Controller,
   Get,
-  // Param,
+  Param,
   Post,
   Put,
-  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { Multer } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { GetUserDto } from './dto/get-user.dto';
-
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-async findAll(@Body() body: GetUserDto): Promise<any> {
-  return this.usersService.findAll(body);
-}
+  @Get(':page/:limit/:search?')
+  async findAll(@Param('page') page: string, @Param('limit') limit: string, @Param('search') search?:string): Promise<any> {
+    console.log(page, limit, "SET PAGE LIMIT");
+    console.log(search, 'CONSOLE LOG SEARCH');
+    return this.usersService.findAll(parseInt(page), parseInt(limit), search);
+  }
 
   @Post()
   async create(@Body() body: CreateUserDto): Promise<any> {

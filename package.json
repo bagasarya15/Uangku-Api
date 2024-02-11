@@ -21,7 +21,7 @@
     "stg": "stg -D mysql -h localhost -p 3306 -d uangku -u root --indices --associations-file ./association.csv --out-dir models --clean"
   },
   "dependencies": {
-    "@nestjs/common": "^10.0.0",
+    "@nestjs/common": "^10.3.2",
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.3.0",

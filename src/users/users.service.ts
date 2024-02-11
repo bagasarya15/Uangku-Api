@@ -4,22 +4,33 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { roles, users } from '../../models';
 import { v2 as cloudinary } from 'cloudinary';
-import { GetUserDto } from './dto/get-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { cloudinaryConfig } from '../helpers/cloudinary';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { responsePaginate } from '../helpers/response-paginate';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Op } from 'sequelize';
 import * as jwt from 'jsonwebtoken';
+import { Op, Sequelize } from 'sequelize';
 
 @Injectable()
 export class UsersService {
-  async findAll(body: GetUserDto) {
+  async findAll(page: number, limit: number, search?:string) {
     try {
-      const { page, limit } = body;
+
+      let whereClause = {};
+
+      if (search) {
+        whereClause = {
+          [Op.or]: [ 
+            { name: { [Op.like]: `%${search}%` } }, 
+            { email: { [Op.like]: `%${search}%` } },
+          ],
+        };
+      }
+
       const offset = (page - 1) * limit;
       const data = await users.findAll({
+        where: whereClause,
         include: [
           {
             model: roles,
@@ -29,6 +40,7 @@ export class UsersService {
         limit: limit,
         offset: offset,
       });
+
       const totalCount = await users.count();
 
       return responsePaginate(data, totalCount, page, limit);
@@ -36,7 +48,6 @@ export class UsersService {
       throw error;
     }
   }
-  
 
   async create(body: CreateUserDto) {
     try {
