@@ -15,6 +15,7 @@ export interface categoryAttributes {
   category_name?: string;
   category_type?: string;
   user_id?: string;
+  created_at?: Date;
 }
 
 @Table({ tableName: 'category', timestamps: false })
@@ -36,6 +37,9 @@ export class category
   @Column({ allowNull: true, type: DataType.STRING(255) })
   @Index({ name: 'user_id', using: 'BTREE', order: 'ASC', unique: false })
   user_id?: string;
+
+  @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
+  created_at?: Date;
 
   @BelongsTo(() => users)
   user?: users;

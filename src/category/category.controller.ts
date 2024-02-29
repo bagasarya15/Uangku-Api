@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -12,19 +12,15 @@ export class CategoryController {
     return this.categoryService.create(body);
   }
 
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  @Post('get-category')
+  findAll(@Body() body: { page: number; limit: number, search:string, user_id:string }) {
+    console.log(body, 'INI CEK PAGE LIMIT')
+    return this.categoryService.findAll(body);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @Put('update')
+  update(@Body() body: UpdateCategoryDto) {
+    return this.categoryService.update(body);
   }
 
   @Delete(':id')

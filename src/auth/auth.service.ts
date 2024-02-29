@@ -69,7 +69,7 @@ export class AuthService {
       },
       process.env.SECRET_KEY,
       {
-        expiresIn: '30m',
+        expiresIn: '3h',
       },
     );
 

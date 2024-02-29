@@ -15,6 +15,7 @@ export interface expenseAttributes {
   user_id?: string;
   category_id?: string;
   expense_datetime?: Date;
+  created_at?: Date;
 }
 
 @Table({ tableName: 'expense', timestamps: false })
@@ -42,4 +43,7 @@ export class expense
 
   @Column({ allowNull: true, type: DataType.DATE, defaultValue: DataType.NOW })
   expense_datetime?: Date;
+
+  @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
+  created_at?: Date;
 }

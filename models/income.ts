@@ -15,6 +15,7 @@ export interface incomeAttributes {
   user_id?: string;
   category_id?: string;
   income_datetime?: Date;
+  created_at?: Date;
 }
 
 @Table({ tableName: 'income', timestamps: false })
@@ -42,4 +43,7 @@ export class income
 
   @Column({ allowNull: true, type: DataType.DATE, defaultValue: DataType.NOW })
   income_datetime?: Date;
+
+  @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
+  created_at?: Date;
 }
