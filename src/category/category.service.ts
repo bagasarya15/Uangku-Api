@@ -102,7 +102,23 @@ export class CategoryService {
     }
   }
   
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id : string) {
+    try {
+      const deletedCategory = await category.destroy({ where: { id } });
+      
+      if (deletedCategory === 0) {
+        throw new HttpException({
+          status: 404,
+          message: 'Category not found',
+        }, HttpStatus.NOT_FOUND);
+      }
+  
+      return {
+        status: 200,
+        message: 'Category deleted successfully',
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }
