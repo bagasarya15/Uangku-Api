@@ -7,8 +7,10 @@ import {
   Sequelize,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript';
 import { users } from './users';
+import { expense } from './expense';
 
 export interface categoryAttributes {
   id: string;
@@ -43,4 +45,7 @@ export class category
 
   @BelongsTo(() => users)
   user?: users;
+
+  @HasMany(() => expense, { sourceKey: 'id' })
+  expenses?: expense[];
 }

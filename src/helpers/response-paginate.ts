@@ -1,13 +1,13 @@
-export function responsePaginate(data: any, totalCount: number, page: number, limit: number) {
+export function responsePaginate(collection: any, totalCount: number, page: number, limit: number) {
   const totalPages = Math.ceil(totalCount / limit);
   return {
     status: 200,
     message: 'Success',
-    result: data,
+    records: collection,
     meta: {
       total: totalCount,
       totalPages: totalPages,
-      totalCurrentPages: data.length,
+      totalCurrentPages: collection.length,
       currentPage: page,
     },
   };

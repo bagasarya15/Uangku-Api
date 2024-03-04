@@ -6,7 +6,9 @@ import {
   Index,
   Sequelize,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
+import { category } from './category';
 
 export interface expenseAttributes {
   id: string;
@@ -37,6 +39,7 @@ export class expense
   @Index({ name: 'user_id', using: 'BTREE', order: 'ASC', unique: false })
   user_id?: string;
 
+  @ForeignKey(() => category)
   @Column({ allowNull: true, type: DataType.STRING(255) })
   @Index({ name: 'category_id', using: 'BTREE', order: 'ASC', unique: false })
   category_id?: string;
@@ -46,4 +49,7 @@ export class expense
 
   @Column({ type: DataType.DATE, defaultValue: DataType.NOW })
   created_at?: Date;
+
+  @BelongsTo(() => category)
+  category?: category;
 }
