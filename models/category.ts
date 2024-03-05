@@ -11,6 +11,7 @@ import {
 } from 'sequelize-typescript';
 import { users } from './users';
 import { expense } from './expense';
+import { income } from './income';
 
 export interface categoryAttributes {
   id: string;
@@ -48,4 +49,7 @@ export class category
 
   @HasMany(() => expense, { sourceKey: 'id' })
   expenses?: expense[];
+
+  @HasMany(() => income, { sourceKey: 'id' })
+  incomes?: income[];
 }

@@ -1,3 +1,4 @@
 1:N, id, role_id, roles, users
 1:N, id, user_id, users, category
-1:N,id, category_id, category, expense
+1:N, id, category_id, category, expense
+1:N, id, category_id, category, income

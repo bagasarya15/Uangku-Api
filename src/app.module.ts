@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { ExpenseModule } from './expense/expense.module';
+import { IncomeModule } from './income/income.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ExpenseModule } from './expense/expense.module';
     AuthModule,
     CategoryModule,
     ExpenseModule,
+    IncomeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
