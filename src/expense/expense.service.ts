@@ -76,7 +76,7 @@ export class ExpenseService {
           returning: true 
         }
       );
-      return {status:200, message: 'Update expense successfully', records: resource}
+      return {status:200, message: 'Update expense successfully', data : resource}
     } catch (error) {
       throw error;
     }
