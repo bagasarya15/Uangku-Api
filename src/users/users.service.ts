@@ -14,15 +14,14 @@ import { Op, Sequelize } from 'sequelize';
 
 @Injectable()
 export class UsersService {
-  async findAll(page: number, limit: number, search?:string) {
+  async findAll(page: number, limit: number, search?: string) {
     try {
-
       let whereClause = {};
 
       if (search) {
         whereClause = {
-          [Op.or]: [ 
-            { name: { [Op.like]: `%${search}%` } }, 
+          [Op.or]: [
+            { name: { [Op.like]: `%${search}%` } },
             { email: { [Op.like]: `%${search}%` } },
           ],
         };
@@ -60,16 +59,19 @@ export class UsersService {
       });
 
       if (checkUser) {
-        throw new HttpException({
-          status: 422,
-          message: 'Users already exist',
-        }, HttpStatus.UNPROCESSABLE_ENTITY);
+        throw new HttpException(
+          {
+            status: 422,
+            message: 'Users already exist',
+          },
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
       } else {
         const currentTimeUTC = DateTime.utc();
         const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
 
         const role_id = await roles.findOne({
-          where: {name : 'users'}
+          where: { name: 'users' },
         });
 
         const data = await users.create({
@@ -108,18 +110,21 @@ export class UsersService {
 
       if (body.username !== userToUpdate.username) {
         const existingUser = await users.findOne({
-            where: {
-                username: body.username
-            }
+          where: {
+            username: body.username,
+          },
         });
 
         if (existingUser) {
-          throw new HttpException({
-            status: 422,
-            message: 'Users already exist',
-          }, HttpStatus.UNPROCESSABLE_ENTITY);
+          throw new HttpException(
+            {
+              status: 422,
+              message: 'Users already exist',
+            },
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
         }
-    }
+      }
 
       userToUpdate.username = body.username;
       userToUpdate.name = body.name;
@@ -137,14 +142,14 @@ export class UsersService {
       }
 
       await userToUpdate.save();
-      
+
       const token = await this.generateToken(userToUpdate.username);
 
       return {
         status: 200,
         message: 'Update profile successfully',
         result: userToUpdate,
-        tokenUpdate : token
+        tokenUpdate: token,
       };
     } catch (error: any) {
       throw error;
@@ -153,34 +158,34 @@ export class UsersService {
 
   async deleteImage(body: { userId: string }): Promise<any> {
     try {
-        cloudinaryConfig();
-        const userId = body.userId;
-        const userToUpdate = await users.findByPk(userId);
-        if (!userToUpdate) {
-            return {
-                status: 404,
-                message: 'User not found',
-            };
-        }
-
-        if (userToUpdate.image) {
-          const publicId = userToUpdate.image.split('/').pop()?.split('.')[0];
-          if (publicId) {
-              const folderPublicId = `users/${publicId}`;
-              await cloudinary.uploader.destroy(folderPublicId);
-          }
+      cloudinaryConfig();
+      const userId = body.userId;
+      const userToUpdate = await users.findByPk(userId);
+      if (!userToUpdate) {
+        return {
+          status: 404,
+          message: 'User not found',
+        };
       }
 
-        userToUpdate.image = 'default.jpg';
-        await userToUpdate.save();
-        const token = await this.generateToken(userToUpdate.username);
-        return {
-            status: 200,
-            message: 'Image updated successfully',
-            tokenUpdate : token
-        };
+      if (userToUpdate.image) {
+        const publicId = userToUpdate.image.split('/').pop()?.split('.')[0];
+        if (publicId) {
+          const folderPublicId = `users/${publicId}`;
+          await cloudinary.uploader.destroy(folderPublicId);
+        }
+      }
+
+      userToUpdate.image = 'default.jpg';
+      await userToUpdate.save();
+      const token = await this.generateToken(userToUpdate.username);
+      return {
+        status: 200,
+        message: 'Image updated successfully',
+        tokenUpdate: token,
+      };
     } catch (error: any) {
-        throw error;
+      throw error;
     }
   }
 
@@ -188,7 +193,7 @@ export class UsersService {
     let data = await users.findOne({
       attributes: ['id', 'username', 'name', 'email', 'image', 'is_active'],
       where: {
-        username : username
+        username: username,
       },
       include: [
         {
