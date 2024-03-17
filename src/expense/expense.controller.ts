@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
@@ -15,7 +23,6 @@ export class ExpenseController {
 
   @Post('get-expense')
   findAll(@Body() body: GetExpenseDto) {
-    console.log(body, 'INI CEK PAGE LIMIT PENGELUARAN')
     return this.expenseService.findAll(body);
   }
 
