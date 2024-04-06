@@ -21,19 +21,25 @@ export class AuthService {
       });
 
       if (!user) {
-        throw new HttpException({
-          status: 400,
-          message: 'wrong username or password',
-        }, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          {
+            status: 400,
+            message: 'wrong username or password',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        throw new HttpException({
-          status: 400,
-          message: 'wrong username or password',
-        }, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          {
+            status: 400,
+            message: 'wrong username or password',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
       const token = await this.generateToken(usernameOrEmail);
