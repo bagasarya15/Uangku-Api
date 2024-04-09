@@ -35,7 +35,7 @@ let ExpenseService = class ExpenseService {
             const { page, limit, search, user_id } = body;
             const offset = (page - 1) * limit;
             let whereClause = { user_id };
-            let orderClause = [['created_at', 'DESC']];
+            let orderClause = [['expense_datetime', 'DESC']];
             if (search) {
                 whereClause = {
                     ...whereClause,

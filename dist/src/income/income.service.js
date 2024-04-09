@@ -22,9 +22,9 @@ let IncomeService = class IncomeService {
                 category_id: category_id,
                 name: name,
                 nominal: nominal,
-                income_datetime: income_datetime
+                income_datetime: income_datetime,
             });
-            return { status: 201, message: "Success", data: resource.toJSON() };
+            return { status: 201, message: 'Success', data: resource.toJSON() };
         }
         catch (error) {
             throw error;
@@ -35,13 +35,11 @@ let IncomeService = class IncomeService {
             const { page, limit, search, user_id } = body;
             const offset = (page - 1) * limit;
             let whereClause = { user_id };
-            let orderClause = [['created_at', 'DESC']];
+            let orderClause = [['income_datetime', 'DESC']];
             if (search) {
                 whereClause = {
                     ...whereClause,
-                    [sequelize_1.Op.or]: [
-                        { category_name: { [sequelize_1.Op.like]: `%${search}%` } },
-                    ],
+                    [sequelize_1.Op.or]: [{ category_name: { [sequelize_1.Op.like]: `%${search}%` } }],
                 };
             }
             const collection = await models_1.income.findAll({
@@ -50,8 +48,11 @@ let IncomeService = class IncomeService {
                 offset,
                 order: orderClause,
                 include: [
-                    { model: models_1.category, attributes: ['id', 'category_name', 'category_type'] }
-                ]
+                    {
+                        model: models_1.category,
+                        attributes: ['id', 'category_name', 'category_type'],
+                    },
+                ],
             });
             const totalCount = await models_1.income.count({ where: whereClause });
             return (0, response_paginate_1.responsePaginate)(collection, totalCount, page, limit);
@@ -68,12 +69,16 @@ let IncomeService = class IncomeService {
                 category_id,
                 name,
                 nominal,
-                income_datetime
+                income_datetime,
             }, {
                 where: { id },
-                returning: true
+                returning: true,
             });
-            return { status: 200, message: 'Update income successfully', data: resource };
+            return {
+                status: 200,
+                message: 'Update income successfully',
+                data: resource,
+            };
         }
         catch (error) {
             throw error;
@@ -82,7 +87,7 @@ let IncomeService = class IncomeService {
     async remove(id) {
         try {
             const resource = await models_1.income.destroy({
-                where: { id }
+                where: { id },
             });
             if (resource === 0) {
                 throw new common_1.HttpException({
