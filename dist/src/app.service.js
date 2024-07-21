@@ -10,7 +10,7 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     getHello() {
-        return 'SUCCESS';
+        return 'UANGKU API V.1.2';
     }
 };
 exports.AppService = AppService;

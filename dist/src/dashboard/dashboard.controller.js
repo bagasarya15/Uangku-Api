@@ -23,6 +23,9 @@ let DashboardController = class DashboardController {
     getIndexDashboard(body) {
         return this.dashboardService.indexDashboard(body);
     }
+    filterPengeluaranByCategory(body) {
+        return this.dashboardService.filterPengeluaranByCategory(body);
+    }
 };
 exports.DashboardController = DashboardController;
 __decorate([
@@ -32,6 +35,13 @@ __decorate([
     __metadata("design:paramtypes", [filter_dashboard_dto_1.FilterDashboardDto]),
     __metadata("design:returntype", void 0)
 ], DashboardController.prototype, "getIndexDashboard", null);
+__decorate([
+    (0, common_1.Post)('expense-with-category'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [filter_dashboard_dto_1.FilterPengeluaranByCategoryDto]),
+    __metadata("design:returntype", void 0)
+], DashboardController.prototype, "filterPengeluaranByCategory", null);
 exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboard'),
     __metadata("design:paramtypes", [dashboard_service_1.DashboardService])

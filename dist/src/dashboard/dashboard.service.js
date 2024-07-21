@@ -73,11 +73,41 @@ let DashboardService = class DashboardService {
             return { status: 400, message: error.message };
         }
     }
+    async filterPengeluaranByCategory(body) {
+        try {
+            const { user_id, category_id, start_date, end_date } = body;
+            if (!user_id || !category_id || !start_date || !end_date) {
+                return {
+                    status: 200,
+                    message: 'Success',
+                    records: { expenseTotal: 0 },
+                };
+            }
+            else if (user_id && category_id && start_date && end_date) {
+                const expenses = await models_1.expense.sum('nominal', {
+                    where: {
+                        user_id: user_id,
+                        expense_datetime: {
+                            [sequelize_1.Op.between]: [start_date, end_date],
+                        },
+                    },
+                });
+                return {
+                    status: 200,
+                    message: 'success',
+                    records: { expenseTotal: expenses || 0 },
+                };
+            }
+        }
+        catch (error) {
+            return { status: 400, message: error.message };
+        }
+    }
 };
 exports.DashboardService = DashboardService;
 exports.DashboardService = DashboardService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], DashboardService);
-``;
+;
 //# sourceMappingURL=dashboard.service.js.map

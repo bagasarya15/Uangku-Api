@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FilterDashboardDto = void 0;
+exports.FilterPengeluaranByCategoryDto = exports.FilterDashboardDto = void 0;
 const class_validator_1 = require("class-validator");
 class FilterDashboardDto {
 }
@@ -26,4 +26,23 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Date)
 ], FilterDashboardDto.prototype, "end_date", void 0);
+class FilterPengeluaranByCategoryDto {
+}
+exports.FilterPengeluaranByCategoryDto = FilterPengeluaranByCategoryDto;
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], FilterPengeluaranByCategoryDto.prototype, "user_id", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], FilterPengeluaranByCategoryDto.prototype, "category_id", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], FilterPengeluaranByCategoryDto.prototype, "start_date", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Date)
+], FilterPengeluaranByCategoryDto.prototype, "end_date", void 0);
 //# sourceMappingURL=filter-dashboard.dto.js.map
