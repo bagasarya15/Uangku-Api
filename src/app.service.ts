@@ -4,6 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getHello(): string {
     // return 'Hello World!';
-    return 'SUCCESS';
+    return 'UANGKU API V.1.2';
   }
 }
