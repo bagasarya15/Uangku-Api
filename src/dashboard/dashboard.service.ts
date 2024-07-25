@@ -84,6 +84,7 @@ export class DashboardService {
             expense_datetime: {
               [Op.between]: [start_date, end_date],
             },
+            category_id : category_id
           },
         });
 

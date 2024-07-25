@@ -90,6 +90,7 @@ let DashboardService = class DashboardService {
                         expense_datetime: {
                             [sequelize_1.Op.between]: [start_date, end_date],
                         },
+                        category_id: category_id
                     },
                 });
                 return {
