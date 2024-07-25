@@ -17,7 +17,7 @@ let AuthModule = class AuthModule {
 exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [sequelize_1.SequelizeModule.forFeature([models_1.users, models_1.roles])],
+        imports: [sequelize_1.SequelizeModule.forFeature([models_1.users, models_1.roles, models_1.users_token])],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService],
     })

@@ -20,4 +20,5 @@ __exportStar(require("./income"), exports);
 __exportStar(require("./roles"), exports);
 __exportStar(require("./sequelizemeta"), exports);
 __exportStar(require("./users"), exports);
+__exportStar(require("./users_token"), exports);
 //# sourceMappingURL=index.js.map

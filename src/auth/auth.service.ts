@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
 import { LoginDto } from './dto/login.dto';
-import { roles, users } from '../../models';
+import { roles, users, users_token } from '../../models';
 import { Op } from 'sequelize';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -42,13 +43,37 @@ export class AuthService {
         );
       }
 
+      const usersToken = await users_token.findOne({
+        where : {
+          user_id : user.id
+        }
+      });
+
       const token = await this.generateToken(usernameOrEmail);
+      const secretKey = crypto.randomBytes(300).toString('hex');
+
+      if(usersToken){
+        await users_token.update({
+          token : token,
+          secret_key : secretKey
+        }, {
+          where: {
+            user_id: user.id,
+          },
+        });
+      }else{
+        await users_token.create({
+          user_id : user.id,
+          token: token,
+          secret_key : secretKey
+        })
+      }
 
       return {
         status: 200,
         message: 'Login success',
         records: user,
-        token: token,
+        token: secretKey,
       };
     } catch (error) {
       throw error;
