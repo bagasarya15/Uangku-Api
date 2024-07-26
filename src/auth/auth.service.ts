@@ -106,4 +106,26 @@ export class AuthService {
 
     return token;
   }
+
+  async isAuthorize(body: any) {
+    try {
+      const { secret_key } = body;
+      const usersToken = await users_token.findOne({
+        where: {
+          secret_key: secret_key
+        }
+      });
+      if (!usersToken) {
+        throw new Error('Unauthorized');
+      }
+      return {
+        status : 200,
+        message : 'Success',
+        records : usersToken
+      }; 
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 }

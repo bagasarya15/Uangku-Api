@@ -4,4 +4,5 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     create(body: LoginDto): Promise<any>;
+    isAuthorize(body: any): Promise<any>;
 }

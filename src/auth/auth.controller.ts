@@ -17,4 +17,9 @@ export class AuthController {
   async create(@Body() body: LoginDto): Promise<any> {
     return this.authService.login(body);
   }
+
+  @Post('authorize')
+  async isAuthorize(@Body() body:any) : Promise<any> {
+    return this.authService.isAuthorize(body);
+  }
 }

@@ -97,6 +97,27 @@ let AuthService = class AuthService {
         });
         return token;
     }
+    async isAuthorize(body) {
+        try {
+            const { secret_key } = body;
+            const usersToken = await models_1.users_token.findOne({
+                where: {
+                    secret_key: secret_key
+                }
+            });
+            if (!usersToken) {
+                throw new Error('Unauthorized');
+            }
+            return {
+                status: 200,
+                message: 'Success',
+                records: usersToken
+            };
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
