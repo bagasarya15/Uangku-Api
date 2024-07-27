@@ -1,11 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Sequelize } from 'sequelize-typescript';
-import { LoginDto } from './dto/login.dto';
-import { roles, users, users_token } from '../../models';
 import { Op } from 'sequelize';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import * as crypto from 'crypto';
+import * as CryptoJS from 'crypto-js';
+import { LoginDto } from './dto/login.dto';
+import { Sequelize } from 'sequelize-typescript';
+import { roles, users, users_token } from '../../models';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
 
 @Injectable()
 export class AuthService {
@@ -50,12 +51,16 @@ export class AuthService {
       });
 
       const token = await this.generateToken(usernameOrEmail);
-      const secretKey = crypto.randomBytes(300).toString('hex');
+
+      let ciphertext = CryptoJS.AES.encrypt(
+        JSON.stringify(token),
+        process.env.SECRET_KEY
+      ).toString();
 
       if(usersToken){
         await users_token.update({
           token : token,
-          secret_key : secretKey
+          secret_key : process.env.SECRET_KEY 
         }, {
           where: {
             user_id: user.id,
@@ -65,7 +70,7 @@ export class AuthService {
         await users_token.create({
           user_id : user.id,
           token: token,
-          secret_key : secretKey
+          secret_key : process.env.SECRET_KEY
         })
       }
 
@@ -73,7 +78,7 @@ export class AuthService {
         status: 200,
         message: 'Login success',
         records: user,
-        token: secretKey,
+        token: ciphertext,
       };
     } catch (error) {
       throw error;

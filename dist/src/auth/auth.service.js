@@ -10,13 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
-const common_1 = require("@nestjs/common");
-const sequelize_typescript_1 = require("sequelize-typescript");
-const models_1 = require("../../models");
 const sequelize_1 = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+const CryptoJS = require("crypto-js");
+const sequelize_typescript_1 = require("sequelize-typescript");
+const models_1 = require("../../models");
+const common_1 = require("@nestjs/common");
 let AuthService = class AuthService {
     constructor(sequelize) {
         this.sequelize = sequelize;
@@ -48,11 +48,11 @@ let AuthService = class AuthService {
                 }
             });
             const token = await this.generateToken(usernameOrEmail);
-            const secretKey = crypto.randomBytes(300).toString('hex');
+            let ciphertext = CryptoJS.AES.encrypt(JSON.stringify(token), process.env.SECRET_KEY).toString();
             if (usersToken) {
                 await models_1.users_token.update({
                     token: token,
-                    secret_key: secretKey
+                    secret_key: process.env.SECRET_KEY
                 }, {
                     where: {
                         user_id: user.id,
@@ -63,14 +63,14 @@ let AuthService = class AuthService {
                 await models_1.users_token.create({
                     user_id: user.id,
                     token: token,
-                    secret_key: secretKey
+                    secret_key: process.env.SECRET_KEY
                 });
             }
             return {
                 status: 200,
                 message: 'Login success',
                 records: user,
-                token: secretKey,
+                token: ciphertext,
             };
         }
         catch (error) {

@@ -1,5 +1,5 @@
-import { Sequelize } from 'sequelize-typescript';
 import { LoginDto } from './dto/login.dto';
+import { Sequelize } from 'sequelize-typescript';
 import { users_token } from '../../models';
 export declare class AuthService {
     private sequelize;
