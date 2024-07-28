@@ -39,7 +39,10 @@ let IncomeService = class IncomeService {
             if (search) {
                 whereClause = {
                     ...whereClause,
-                    [sequelize_1.Op.or]: [{ category_name: { [sequelize_1.Op.like]: `%${search}%` } }],
+                    [sequelize_1.Op.or]: [
+                        { name: { [sequelize_1.Op.like]: `%${search}%` } },
+                        sequelize_1.Sequelize.literal(`(SELECT category_name FROM category WHERE category.id = income.category_id) LIKE '%${search}%'`),
+                    ],
                 };
             }
             const collection = await models_1.income.findAll({
@@ -50,7 +53,8 @@ let IncomeService = class IncomeService {
                 include: [
                     {
                         model: models_1.category,
-                        attributes: ['id', 'category_name', 'category_type'],
+                        as: 'category',
+                        attributes: ['category_name'],
                     },
                 ],
             });

@@ -5,4 +5,5 @@ export declare class AuthController {
     constructor(authService: AuthService);
     create(body: LoginDto): Promise<any>;
     isAuthorize(body: any): Promise<any>;
+    activatedAccount(body: any): Promise<any>;
 }

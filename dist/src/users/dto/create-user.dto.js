@@ -27,4 +27,9 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)({ message: 'Name is required' }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)({ message: 'Email is required' }),
+    (0, class_validator_1.IsEmail)({ require_tld: true }, { message: 'Invalid email format' }),
+    __metadata("design:type", String)
+], CreateUserDto.prototype, "email", void 0);
 //# sourceMappingURL=create-user.dto.js.map

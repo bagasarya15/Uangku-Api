@@ -32,14 +32,20 @@ let AuthService = class AuthService {
             if (!user) {
                 throw new common_1.HttpException({
                     status: 400,
-                    message: 'wrong username or password',
+                    message: 'username atau password salah',
                 }, common_1.HttpStatus.BAD_REQUEST);
             }
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
                 throw new common_1.HttpException({
                     status: 400,
-                    message: 'wrong username or password',
+                    message: 'username atau password salah',
+                }, common_1.HttpStatus.BAD_REQUEST);
+            }
+            if (user.is_active == 0) {
+                throw new common_1.HttpException({
+                    status: 400,
+                    message: 'akun anda belum melakukan aktivasi',
                 }, common_1.HttpStatus.BAD_REQUEST);
             }
             const usersToken = await models_1.users_token.findOne({
@@ -112,6 +118,31 @@ let AuthService = class AuthService {
                 status: 200,
                 message: 'Success',
                 records: usersToken
+            };
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async activatedAccount(body) {
+        try {
+            const { email, is_active } = body;
+            const user = await models_1.users.findOne({
+                where: { email: email }
+            });
+            if (!user) {
+                return {
+                    status: 404,
+                    message: "user tidak ditemukan"
+                };
+            }
+            const update = await models_1.users.update({
+                is_active: is_active,
+            }, { where: { email: email }, returning: true });
+            return {
+                status: 200,
+                message: "aktivasi akun berhasil",
+                records: update
             };
         }
         catch (error) {

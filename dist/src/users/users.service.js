@@ -53,37 +53,45 @@ let UsersService = class UsersService {
             const myUUID = (0, uuid_1.v4)();
             const salt = await bcrypt.genSalt(10);
             const passHash = await bcrypt.hash(body.password, salt);
-            const checkUser = await models_1.users.findOne({
+            const checkUsername = await models_1.users.findOne({
                 where: { username: body.username },
             });
-            if (checkUser) {
+            if (checkUsername) {
                 throw new common_1.HttpException({
                     status: 422,
-                    message: 'Users already exist',
+                    message: 'Username tidak tersedia',
                 }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            else {
-                const currentTimeUTC = luxon_1.DateTime.utc();
-                const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
-                const role_id = await models_1.roles.findOne({
-                    where: { name: 'users' },
-                });
-                const data = await models_1.users.create({
-                    id: myUUID,
-                    username: body.username,
-                    password: passHash,
-                    name: body.name,
-                    image: 'default.jpg',
-                    role_id: role_id.id,
-                    is_active: 1,
-                    created_at: currentTimeID.toJSDate(),
-                });
-                return {
-                    status: 201,
-                    message: 'Create users successfully',
-                    result: data,
-                };
+            const checkEmail = await models_1.users.findOne({
+                where: { email: body.email },
+            });
+            if (checkEmail) {
+                throw new common_1.HttpException({
+                    status: 422,
+                    message: 'Email tidak tersedia',
+                }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
             }
+            const currentTimeUTC = luxon_1.DateTime.utc();
+            const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
+            const role = await models_1.roles.findOne({
+                where: { name: 'users' },
+            });
+            const data = await models_1.users.create({
+                id: myUUID,
+                username: body.username,
+                password: passHash,
+                name: body.name,
+                image: 'default.jpg',
+                email: body.email,
+                role_id: role.id,
+                is_active: 0,
+                created_at: currentTimeID.toJSDate(),
+            });
+            return {
+                status: 201,
+                message: 'User created successfully',
+                result: data,
+            };
         }
         catch (error) {
             throw error;
@@ -109,6 +117,19 @@ let UsersService = class UsersService {
                     throw new common_1.HttpException({
                         status: 422,
                         message: 'Users already exist',
+                    }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+            }
+            if (body.email !== userToUpdate.email) {
+                const checkEmail = await models_1.users.findOne({
+                    where: {
+                        username: body.username,
+                    },
+                });
+                if (checkEmail) {
+                    throw new common_1.HttpException({
+                        status: 422,
+                        message: 'Email already exist',
                     }, common_1.HttpStatus.UNPROCESSABLE_ENTITY);
                 }
             }

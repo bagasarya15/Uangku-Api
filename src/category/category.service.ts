@@ -34,7 +34,7 @@ export class CategoryService {
       const { category_name, category_type, user_id } = body;
 
       const existingCategory = await category.findOne({
-        where: { category_name, user_id },
+        where: { category_name, user_id, category_type },
       });
 
       if (existingCategory) {

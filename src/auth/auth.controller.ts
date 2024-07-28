@@ -3,7 +3,8 @@ import {
   // Get,
   Post,
   Body,
-  // Patch,
+  Patch,
+  Put,
   // Param,
   // Delete,
 } from '@nestjs/common';
@@ -21,5 +22,10 @@ export class AuthController {
   @Post('authorize')
   async isAuthorize(@Body() body:any) : Promise<any> {
     return this.authService.isAuthorize(body);
+  }
+
+  @Put('aktivasi')
+  async activatedAccount(@Body() body:any) : Promise<any> {
+    return this.authService.activatedAccount(body);
   }
 }

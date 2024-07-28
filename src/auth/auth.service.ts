@@ -26,7 +26,7 @@ export class AuthService {
         throw new HttpException(
           {
             status: 400,
-            message: 'wrong username or password',
+            message: 'username atau password salah',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -38,7 +38,17 @@ export class AuthService {
         throw new HttpException(
           {
             status: 400,
-            message: 'wrong username or password',
+            message: 'username atau password salah',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if(user.is_active == 0){
+        throw new HttpException(
+          {
+            status: 400,
+            message: 'akun anda belum melakukan aktivasi',
           },
           HttpStatus.BAD_REQUEST,
         );
@@ -132,5 +142,36 @@ export class AuthService {
       throw error;
     }
   }
-  
+
+  async activatedAccount(body :any) : Promise<any>{
+    try{
+      const {email, is_active} = body;
+      const user = await users.findOne({
+        where : {email :email}
+      })
+
+      if(!user){
+        return{
+          status : 404,
+          message : "user tidak ditemukan"
+        }
+      } 
+      
+      const update = await users.update(
+        {
+          is_active: is_active,
+        },
+        { where: { email: email }, returning: true },
+      );
+
+      return{
+        status : 200,
+        message : "aktivasi akun berhasil",
+        records : update
+      }
+
+    }catch(error){
+      throw error;
+    }
+  } 
 }

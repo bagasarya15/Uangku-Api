@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { category, income } from '../../models';
 import { GetIncomeDto } from './dto/get-income.dto';
 import { uuidV4 } from '../../src/helpers/uuid-helper';
@@ -36,7 +36,12 @@ export class IncomeService {
       if (search) {
         whereClause = {
           ...whereClause,
-          [Op.or]: [{ category_name: { [Op.like]: `%${search}%` } }],
+          [Op.or]: [
+            { name: { [Op.like]: `%${search}%` } },
+            Sequelize.literal(
+              `(SELECT category_name FROM category WHERE category.id = income.category_id) LIKE '%${search}%'`,
+            ),
+          ],
         };
       }
 
@@ -48,7 +53,8 @@ export class IncomeService {
         include: [
           {
             model: category,
-            attributes: ['id', 'category_name', 'category_type'],
+            as: 'category',
+            attributes: ['category_name'],
           },
         ],
       });
@@ -60,7 +66,6 @@ export class IncomeService {
       throw error;
     }
   }
-
   async update(body: UpdateIncomeDto) {
     try {
       const { id, user_id, category_id, name, nominal, income_datetime } = body;

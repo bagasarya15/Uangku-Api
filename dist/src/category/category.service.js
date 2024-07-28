@@ -36,7 +36,7 @@ let CategoryService = class CategoryService {
             const myUUID = (0, uuid_1.v4)();
             const { category_name, category_type, user_id } = body;
             const existingCategory = await models_1.category.findOne({
-                where: { category_name, user_id },
+                where: { category_name, user_id, category_type },
             });
             if (existingCategory) {
                 throw new common_1.HttpException({

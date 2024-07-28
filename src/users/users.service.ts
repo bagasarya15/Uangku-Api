@@ -53,49 +53,66 @@ export class UsersService {
       const myUUID = uuidv4();
       const salt = await bcrypt.genSalt(10);
       const passHash = await bcrypt.hash(body.password, salt);
-
-      const checkUser = await users.findOne({
+  
+      // Check if username already exists
+      const checkUsername = await users.findOne({
         where: { username: body.username },
       });
-
-      if (checkUser) {
+  
+      if (checkUsername) {
         throw new HttpException(
           {
             status: 422,
-            message: 'Users already exist',
+            message: 'Username tidak tersedia',
           },
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
-      } else {
-        const currentTimeUTC = DateTime.utc();
-        const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
-
-        const role_id = await roles.findOne({
-          where: { name: 'users' },
-        });
-
-        const data = await users.create({
-          id: myUUID,
-          username: body.username,
-          password: passHash,
-          name: body.name,
-          image: 'default.jpg',
-          role_id: role_id.id,
-          is_active: 1,
-          created_at: currentTimeID.toJSDate(),
-        });
-
-        return {
-          status: 201,
-          message: 'Create users successfully',
-          result: data,
-        };
       }
+  
+      // Check if email already exists
+      const checkEmail = await users.findOne({
+        where: { email: body.email },
+      });
+  
+      if (checkEmail) {
+        throw new HttpException(
+          {
+            status: 422,
+            message: 'Email tidak tersedia',
+          },
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+  
+      const currentTimeUTC = DateTime.utc();
+      const currentTimeID = currentTimeUTC.setZone('Asia/Jakarta');
+  
+      const role = await roles.findOne({
+        where: { name: 'users' },
+      });
+  
+      const data = await users.create({
+        id: myUUID,
+        username: body.username,
+        password: passHash,
+        name: body.name,
+        image: 'default.jpg',
+        email: body.email,
+        role_id: role.id,
+        is_active: 0,
+        created_at: currentTimeID.toJSDate(),
+      });
+  
+      return {
+        status: 201,
+        message: 'User created successfully',
+        result: data,
+      };
     } catch (error: any) {
       throw error;
     }
   }
-
+  
   async updateProfile(body: UpdateProfileDto, file: Multer.File): Promise<any> {
     try {
       cloudinaryConfig();
@@ -120,6 +137,24 @@ export class UsersService {
             {
               status: 422,
               message: 'Users already exist',
+            },
+            HttpStatus.UNPROCESSABLE_ENTITY,
+          );
+        }
+      }
+
+      if (body.email !== userToUpdate.email) {
+        const checkEmail = await users.findOne({
+          where: {
+            username: body.username,
+          },
+        });
+
+        if (checkEmail) {
+          throw new HttpException(
+            {
+              status: 422,
+              message: 'Email already exist',
             },
             HttpStatus.UNPROCESSABLE_ENTITY,
           );

@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty({ message: 'Username is required' })
@@ -11,9 +11,9 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Name is required' })
   name: string;
 
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail({ require_tld: true }, { message: 'Invalid email format' })
+  email: string;
   // @IsNotEmpty({ message: 'Status is required' })
   // is_active: boolean;
-  // @IsNotEmpty({ message: 'Email is required' })
-  // @IsEmail({ require_tld: true }, { message: 'Invalid email format' })
-  // email: string;
 }
