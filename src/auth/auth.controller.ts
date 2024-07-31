@@ -20,12 +20,17 @@ export class AuthController {
   }
 
   @Post('authorize')
-  async isAuthorize(@Body() body:any) : Promise<any> {
+  async isAuthorize(@Body() body: any): Promise<any> {
     return this.authService.isAuthorize(body);
   }
 
   @Put('aktivasi')
-  async activatedAccount(@Body() body:any) : Promise<any> {
+  async activatedAccount(@Body() body: any): Promise<any> {
     return this.authService.activatedAccount(body);
+  }
+
+  @Put('change-password')
+  async changePassword(@Body() body: any): Promise<any> {
+    return this.authService.changePassword(body);
   }
 }

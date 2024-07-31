@@ -89,7 +89,7 @@ let CategoryService = class CategoryService {
         try {
             const { id, category_name, category_type, user_id } = body;
             const existingCategory = await models_1.category.findOne({
-                where: { category_name, id: { [sequelize_1.Op.not]: id } },
+                where: { category_name, category_type, id: { [sequelize_1.Op.not]: id } },
             });
             if (existingCategory) {
                 throw new common_1.HttpException({

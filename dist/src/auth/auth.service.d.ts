@@ -12,4 +12,5 @@ export declare class AuthService {
         records: users_token;
     }>;
     activatedAccount(body: any): Promise<any>;
+    changePassword(body: any): Promise<any>;
 }

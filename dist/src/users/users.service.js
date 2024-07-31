@@ -17,6 +17,7 @@ const response_paginate_1 = require("../helpers/response-paginate");
 const common_1 = require("@nestjs/common");
 const jwt = require("jsonwebtoken");
 const sequelize_1 = require("sequelize");
+const CryptoJS = require("crypto-js");
 let UsersService = class UsersService {
     async findAll(page, limit, search) {
         try {
@@ -147,11 +148,12 @@ let UsersService = class UsersService {
             }
             await userToUpdate.save();
             const token = await this.generateToken(userToUpdate.username);
+            let ciphertext = CryptoJS.AES.encrypt(JSON.stringify(token), process.env.SECRET_KEY).toString();
             return {
                 status: 200,
                 message: 'Update profile successfully',
                 result: userToUpdate,
-                tokenUpdate: token,
+                tokenUpdate: ciphertext,
             };
         }
         catch (error) {
@@ -179,10 +181,11 @@ let UsersService = class UsersService {
             userToUpdate.image = 'default.jpg';
             await userToUpdate.save();
             const token = await this.generateToken(userToUpdate.username);
+            let ciphertext = CryptoJS.AES.encrypt(JSON.stringify(token), process.env.SECRET_KEY).toString();
             return {
                 status: 200,
                 message: 'Image updated successfully',
-                tokenUpdate: token,
+                tokenUpdate: ciphertext,
             };
         }
         catch (error) {

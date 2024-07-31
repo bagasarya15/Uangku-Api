@@ -11,6 +11,7 @@ import { responsePaginate } from '../helpers/response-paginate';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { Op, Sequelize } from 'sequelize';
+import * as CryptoJS from 'crypto-js';
 
 @Injectable()
 export class UsersService {
@@ -180,11 +181,16 @@ export class UsersService {
 
       const token = await this.generateToken(userToUpdate.username);
 
+      let ciphertext = CryptoJS.AES.encrypt(
+        JSON.stringify(token),
+        process.env.SECRET_KEY
+      ).toString();
+
       return {
         status: 200,
         message: 'Update profile successfully',
         result: userToUpdate,
-        tokenUpdate: token,
+        tokenUpdate: ciphertext,
       };
     } catch (error: any) {
       throw error;
@@ -214,10 +220,16 @@ export class UsersService {
       userToUpdate.image = 'default.jpg';
       await userToUpdate.save();
       const token = await this.generateToken(userToUpdate.username);
+      
+      let ciphertext = CryptoJS.AES.encrypt(
+        JSON.stringify(token),
+        process.env.SECRET_KEY
+      ).toString();
+
       return {
         status: 200,
         message: 'Image updated successfully',
-        tokenUpdate: token,
+        tokenUpdate: ciphertext,
       };
     } catch (error: any) {
       throw error;

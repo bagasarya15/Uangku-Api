@@ -50,15 +50,15 @@ let AuthService = class AuthService {
             }
             const usersToken = await models_1.users_token.findOne({
                 where: {
-                    user_id: user.id
-                }
+                    user_id: user.id,
+                },
             });
             const token = await this.generateToken(usernameOrEmail);
             let ciphertext = CryptoJS.AES.encrypt(JSON.stringify(token), process.env.SECRET_KEY).toString();
             if (usersToken) {
                 await models_1.users_token.update({
                     token: token,
-                    secret_key: process.env.SECRET_KEY
+                    secret_key: process.env.SECRET_KEY,
                 }, {
                     where: {
                         user_id: user.id,
@@ -69,7 +69,7 @@ let AuthService = class AuthService {
                 await models_1.users_token.create({
                     user_id: user.id,
                     token: token,
-                    secret_key: process.env.SECRET_KEY
+                    secret_key: process.env.SECRET_KEY,
                 });
             }
             return {
@@ -108,8 +108,8 @@ let AuthService = class AuthService {
             const { secret_key } = body;
             const usersToken = await models_1.users_token.findOne({
                 where: {
-                    secret_key: secret_key
-                }
+                    secret_key: secret_key,
+                },
             });
             if (!usersToken) {
                 throw new Error('Unauthorized');
@@ -117,7 +117,7 @@ let AuthService = class AuthService {
             return {
                 status: 200,
                 message: 'Success',
-                records: usersToken
+                records: usersToken,
             };
         }
         catch (error) {
@@ -128,12 +128,12 @@ let AuthService = class AuthService {
         try {
             const { email, is_active } = body;
             const user = await models_1.users.findOne({
-                where: { email: email }
+                where: { email: email },
             });
             if (!user) {
                 return {
                     status: 404,
-                    message: "user tidak ditemukan"
+                    message: 'user tidak ditemukan',
                 };
             }
             const update = await models_1.users.update({
@@ -141,12 +141,36 @@ let AuthService = class AuthService {
             }, { where: { email: email }, returning: true });
             return {
                 status: 200,
-                message: "aktivasi akun berhasil",
-                records: update
+                message: 'aktivasi akun berhasil',
+                records: update,
             };
         }
         catch (error) {
             throw error;
+        }
+    }
+    async changePassword(body) {
+        try {
+            const { user_id, oldPassword, newPassword } = body;
+            const user = await models_1.users.findOne({
+                where: { id: user_id },
+            });
+            if (!user) {
+                throw new Error('User not found');
+            }
+            const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
+            if (!isOldPasswordValid) {
+                throw new Error('Old password is incorrect');
+            }
+            const salt = await bcrypt.genSalt(10);
+            const passHash = await bcrypt.hash(newPassword, salt);
+            const update = await models_1.users.update({
+                password: passHash,
+            }, { where: { id: user_id }, returning: true });
+            return { status: 200, message: 'Password changed successfully' };
+        }
+        catch (error) {
+            throw new Error(`Error changing password: ${error.message}`);
         }
     }
 };

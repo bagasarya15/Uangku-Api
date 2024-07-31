@@ -7,7 +7,6 @@ import { Sequelize } from 'sequelize-typescript';
 import { roles, users, users_token } from '../../models';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-
 @Injectable()
 export class AuthService {
   constructor(private sequelize: Sequelize) {}
@@ -44,7 +43,7 @@ export class AuthService {
         );
       }
 
-      if(user.is_active == 0){
+      if (user.is_active == 0) {
         throw new HttpException(
           {
             status: 400,
@@ -55,33 +54,36 @@ export class AuthService {
       }
 
       const usersToken = await users_token.findOne({
-        where : {
-          user_id : user.id
-        }
+        where: {
+          user_id: user.id,
+        },
       });
 
       const token = await this.generateToken(usernameOrEmail);
 
       let ciphertext = CryptoJS.AES.encrypt(
         JSON.stringify(token),
-        process.env.SECRET_KEY
+        process.env.SECRET_KEY,
       ).toString();
 
-      if(usersToken){
-        await users_token.update({
-          token : token,
-          secret_key : process.env.SECRET_KEY 
-        }, {
-          where: {
-            user_id: user.id,
+      if (usersToken) {
+        await users_token.update(
+          {
+            token: token,
+            secret_key: process.env.SECRET_KEY,
           },
-        });
-      }else{
+          {
+            where: {
+              user_id: user.id,
+            },
+          },
+        );
+      } else {
         await users_token.create({
-          user_id : user.id,
+          user_id: user.id,
           token: token,
-          secret_key : process.env.SECRET_KEY
-        })
+          secret_key: process.env.SECRET_KEY,
+        });
       }
 
       return {
@@ -127,36 +129,36 @@ export class AuthService {
       const { secret_key } = body;
       const usersToken = await users_token.findOne({
         where: {
-          secret_key: secret_key
-        }
+          secret_key: secret_key,
+        },
       });
       if (!usersToken) {
         throw new Error('Unauthorized');
       }
       return {
-        status : 200,
-        message : 'Success',
-        records : usersToken
-      }; 
+        status: 200,
+        message: 'Success',
+        records: usersToken,
+      };
     } catch (error) {
       throw error;
     }
   }
 
-  async activatedAccount(body :any) : Promise<any>{
-    try{
-      const {email, is_active} = body;
+  async activatedAccount(body: any): Promise<any> {
+    try {
+      const { email, is_active } = body;
       const user = await users.findOne({
-        where : {email :email}
-      })
+        where: { email: email },
+      });
 
-      if(!user){
-        return{
-          status : 404,
-          message : "user tidak ditemukan"
-        }
-      } 
-      
+      if (!user) {
+        return {
+          status: 404,
+          message: 'user tidak ditemukan',
+        };
+      }
+
       const update = await users.update(
         {
           is_active: is_active,
@@ -164,14 +166,48 @@ export class AuthService {
         { where: { email: email }, returning: true },
       );
 
-      return{
-        status : 200,
-        message : "aktivasi akun berhasil",
-        records : update
-      }
-
-    }catch(error){
+      return {
+        status: 200,
+        message: 'aktivasi akun berhasil',
+        records: update,
+      };
+    } catch (error) {
       throw error;
     }
-  } 
+  }
+
+  async changePassword(body: any): Promise<any> {
+    try {
+      const { user_id, oldPassword, newPassword } = body;
+      const user = await users.findOne({
+        where: { id: user_id },
+      });
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      const isOldPasswordValid = await bcrypt.compare(
+        oldPassword,
+        user.password,
+      );
+      if (!isOldPasswordValid) {
+        throw new Error('Old password is incorrect');
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const passHash = await bcrypt.hash(newPassword, salt);
+
+      const update = await users.update(
+        {
+          password: passHash,
+        },
+        { where: { id: user_id }, returning: true },
+      );
+
+      return { status: 200, message: 'Password changed successfully' };
+    } catch (error) {
+      throw new Error(`Error changing password: ${error.message}`);
+    }
+  }
 }
