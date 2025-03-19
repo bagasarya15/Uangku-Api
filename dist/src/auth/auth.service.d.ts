@@ -9,6 +9,10 @@ export declare class AuthService {
     isAuthorize(body: any): Promise<{
         status: number;
         message: string;
+        records?: undefined;
+    } | {
+        status: number;
+        message: string;
         records: users_token;
     }>;
     activatedAccount(body: any): Promise<any>;

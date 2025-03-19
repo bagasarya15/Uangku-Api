@@ -105,14 +105,18 @@ let AuthService = class AuthService {
     }
     async isAuthorize(body) {
         try {
-            const { secret_key } = body;
+            const { token, secret_key } = body;
             const usersToken = await models_1.users_token.findOne({
                 where: {
+                    token: token,
                     secret_key: secret_key,
                 },
             });
             if (!usersToken) {
-                throw new Error('Unauthorized');
+                return {
+                    status: 401,
+                    message: 'Unauthorized',
+                };
             }
             return {
                 status: 200,
