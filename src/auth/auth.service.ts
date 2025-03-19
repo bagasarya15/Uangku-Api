@@ -126,15 +126,21 @@ export class AuthService {
 
   async isAuthorize(body: any) {
     try {
-      const { secret_key } = body;
+      const { token, secret_key } = body;
       const usersToken = await users_token.findOne({
         where: {
+          token : token,
           secret_key: secret_key,
         },
       });
+      
       if (!usersToken) {
-        throw new Error('Unauthorized');
+        return {
+          status: 401,
+          message: 'Unauthorized',
+        };
       }
+
       return {
         status: 200,
         message: 'Success',
